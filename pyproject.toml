@@ -20,6 +20,7 @@ scikit-learn = "^1.2.1"
 rdkit = "^2022.9.4"
 tensorflow = "^2.11.0"
 deepchem = "^2.7.1"
+tensorflow-addons = "^0.19.0"
 
 
 [build-system]
