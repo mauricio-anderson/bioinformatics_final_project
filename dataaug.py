@@ -1,4 +1,4 @@
-#Experimental Class for Smiles Enumeration, Iterator and SmilesIterator adapted from Keras 1.2.2
+# Experimental Class for Smiles Enumeration, Iterator and SmilesIterator adapted from Keras 1.2.2
 from rdkit import Chem
 import numpy as np
 import threading
@@ -56,8 +56,6 @@ class Iterator(object):
 
     def __next__(self, *args, **kwargs):
         return self.next(*args, **kwargs)
-
-
 
 
 class SmilesIterator(Iterator):
@@ -120,7 +118,7 @@ class SmilesIterator(Iterator):
 
 class SmilesEnumerator(object):
     """SMILES Enumerator, vectorizer and devectorizer
-    
+
     #Arguments
         charset: string containing the characters for the vectorization
           can also be generated via the .fit() method
@@ -142,17 +140,17 @@ class SmilesEnumerator(object):
     @property
     def charset(self):
         return self._charset
-        
+
     @charset.setter
     def charset(self, charset):
         self._charset = charset
         self._charlen = len(charset)
         self._char_to_int = dict((c,i) for i,c in enumerate(charset))
         self._int_to_char = dict((i,c) for i,c in enumerate(charset))
-        
+
     def fit(self, smiles, extra_chars=[], extra_pad = 5):
         """Performs extraction of the charset and length of a SMILES datasets and sets self.pad and self.charset
-        
+
         #Arguments
             smiles: Numpy array or Pandas series containing smiles as strings
             extra_chars: List of extra chars to add to the charset (e.g. "\\\\" when "/" is present)
@@ -161,7 +159,7 @@ class SmilesEnumerator(object):
         charset = set("".join(list(smiles)))
         self.charset = "".join(charset.union(set(extra_chars)))
         self.pad = max([len(smile) for smile in smiles]) + extra_pad
-        
+
     def randomize_smiles(self, smiles):
         """Perform a randomization of a SMILES string
         must be RDKit sanitizable"""
@@ -177,7 +175,7 @@ class SmilesEnumerator(object):
             smiles: Numpy array or Pandas series containing smiles as strings
         """
         one_hot =  np.zeros((smiles.shape[0], self.pad, self._charlen),dtype=np.int8)
-        
+
         if self.leftpad:
             for i,ss in enumerate(smiles):
                 if self.enumerate: ss = self.randomize_smiles(ss)
@@ -193,22 +191,23 @@ class SmilesEnumerator(object):
                     one_hot[i,j,self._char_to_int[c]] = 1
             return one_hot
 
-      
+
     def reverse_transform(self, vect):
         """ Performs a conversion of a vectorized SMILES to a smiles strings
         charset must be the same as used for vectorization.
         #Arguments
             vect: Numpy array of vectorized SMILES.
-        """       
+        """
         smiles = []
         for v in vect:
-            #mask v 
+            #mask v
             v=v[v.sum(axis=1)==1]
             #Find one hot encoded index with argmax, translate to char and join to string
             smile = "".join(self._int_to_char[i] for i in v.argmax(axis=1))
             smiles.append(smile)
         return np.array(smiles)
-     
+
+
 if __name__ == "__main__":
     smiles = np.array([ "CCC(=O)O[C@@]1(CC[NH+](C[C@H]1CC=C)C)c2ccccc2",
                         "CCC[S@@](=O)c1ccc2c(c1)[nH]/c(=N/C(=O)OC)/[nH]2"]*10
@@ -219,8 +218,8 @@ if __name__ == "__main__":
     v = sm_en.transform(smiles)
     transformed = sm_en.reverse_transform(v)
     if len(set(transformed)) > 2: print("Too many different canonical SMILES generated")
-    
-    #Test enumeration 
+
+    #Test enumeration
     sm_en.canonical = False
     sm_en.enumerate = True
     v2 = sm_en.transform(smiles)
@@ -233,21 +232,17 @@ if __name__ == "__main__":
         if smile != smiles[i]:
             print("Error in reconstruction %s %s"%(smile, smiles[i]))
             break
-    
+
     #test Pandas
     import pandas as pd
     df = pd.DataFrame(smiles)
     v = sm_en.transform(df[0])
     if v.shape != (20, 52, 18): print("Possible error in pandas use")
-    
+
     #BUG, when batchsize > x.shape[0], then it only returns x.shape[0]!
     #Test batch generation
     sm_it = SmilesIterator(smiles, np.array([1,2]*10), sm_en, batch_size=10, shuffle=True)
     X, y = sm_it.next()
     if sum(y==1) - sum(y==2) > 1:
         print("Unbalanced generation of batches")
-    if len(X) != 10: print("Error in batchsize generation"  )   
-
-
-
-        
+    if len(X) != 10: print("Error in batchsize generation"  )

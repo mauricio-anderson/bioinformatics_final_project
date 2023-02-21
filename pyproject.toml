@@ -2,7 +2,7 @@
 name = "bioinformatics-final-project"
 version = "0.1.0"
 description = ""
-authors = ["Mauricio Anderson <mauricio.anderson@etermax.com>"]
+authors = ["Mauricio Anderson <m.anderson.ricci@gmail.com>"]
 readme = "README.md"
 packages = [{include = "bioinformatics_final_project"}]
 
