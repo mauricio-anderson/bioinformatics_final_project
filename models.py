@@ -23,13 +23,13 @@ def create_model(vocab_size: int, max_sequence_len: int) -> Sequential:
     embedding_output_dim = 64
 
     gru_units = 128
-    gru_dropout = 0.3
-    # gru_recurrent_dropout = 0.3
+    gru_dropout = 0.2
+    # gru_recurrent_dropout = 0.2
 
-    dropout_rate = 0.2
+    dropout_rate = 0.1
     add_bn = True
     hidden_layer_config = [
-        # {"units": 100, "activation": "relu", "dropout_rate": dropout_rate},
+        {"units": 100, "activation": "relu", "dropout_rate": dropout_rate},
         {"units": 50, "activation": "relu", "dropout_rate": dropout_rate},
         ]
 
